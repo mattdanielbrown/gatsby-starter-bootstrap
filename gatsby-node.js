@@ -1,47 +1,75 @@
-const _ = require('lodash')
-const Promise = require('bluebird')
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
-const select = require('unist-util-select')
-const fs = require('fs-extra')
+const PostTemplate = path.resolve('./src/templates/template.tsx')
 
-exports.createPages = ({ graphql, boundActionCreators }) => {
-  const { createPage } = boundActionCreators
+exports.createPages = ({ graphql, actions }) => {
+  const { createPage } = actions
 
   return new Promise((resolve, reject) => {
-    const pages = []
-    const blogPost = path.resolve('./src/templates/blog-post.js')
     resolve(
       graphql(
         `
           {
-            allMarkdownRemark(limit: 1000) {
+            allFile(filter: { extension: { regex: "/md|tsx/" } }, limit: 1000) {
               edges {
                 node {
-                  frontmatter {
-                    path
+                  id
+                  name: sourceInstanceName
+                  path: absolutePath
+                  remark: childMarkdownRemark {
+                    id
+                    frontmatter {
+                      layout
+                      path
+                    }
                   }
                 }
               }
             }
           }
         `
-      ).then(result => {
-        if (result.errors) {
-          console.log(result.errors)
-          reject(result.errors)
+      ).then(({ errors, data }) => {
+        if (errors) {
+          console.log(errors)
+          reject(errors)
         }
 
-        // Create blog posts pages.
-        _.each(result.data.allMarkdownRemark.edges, edge => {
+        // Create blog posts & pages.
+        const items = data.allFile.edges
+        const posts = items.filter(({ node }) => /posts/.test(node.name))
+        posts.forEach(({ node }) => {
+          if (!node.remark) return
+          const { path } = node.remark.frontmatter
           createPage({
-            path: edge.node.frontmatter.path,
-            component: blogPost,
-            context: {
-              path: edge.node.frontmatter.path,
-            },
+            path,
+            component: PostTemplate,
+          })
+        })
+
+        const pages = items.filter(({ node }) => /page/.test(node.name))
+        pages.forEach(({ node }) => {
+          if (!node.remark) return
+          const { name } = path.parse(node.path)
+          const PageTemplate = path.resolve(node.path)
+          createPage({
+            path: name,
+            component: PageTemplate,
           })
         })
       })
     )
+  })
+}
+
+exports.onCreateWebpackConfig = ({ actions }) => {
+  actions.setWebpackConfig({
+    resolve: {
+      alias: {
+        components: path.resolve(__dirname, 'src/components'),
+        templates: path.resolve(__dirname, 'src/templates'),
+        scss: path.resolve(__dirname, 'src/scss'),
+      },
+    },
   })
 }

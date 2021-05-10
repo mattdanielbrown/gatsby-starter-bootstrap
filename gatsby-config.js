@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 module.exports = {
   siteMetadata: {
     title: 'Gatstrap',
@@ -12,8 +13,15 @@ module.exports = {
     {
       resolve: 'gatsby-source-filesystem',
       options: {
-        path: `${__dirname}/src/pages`,
-        name: 'pages',
+        path: `${__dirname}/content/posts/`,
+        name: 'posts',
+      },
+    },
+    {
+      resolve: 'gatsby-source-filesystem',
+      options: {
+        path: `${__dirname}/content/images/`,
+        name: 'images',
       },
     },
     {
@@ -66,12 +74,6 @@ module.exports = {
       },
     },
     {
-      resolve: 'gatsby-plugin-google-analytics',
-      options: {
-        trackingId: '',
-      },
-    },
-    {
       resolve: 'gatsby-plugin-netlify',
       options: {
         mergeSecurityHeaders: true,
@@ -82,11 +84,12 @@ module.exports = {
     'gatsby-plugin-catch-links',
     'gatsby-plugin-offline',
     'gatsby-plugin-react-helmet',
-    'gatsby-plugin-react-next',
     'gatsby-plugin-sass',
     'gatsby-plugin-sharp',
     'gatsby-plugin-sitemap',
     'gatsby-plugin-twitter',
+    "gatsby-plugin-typegen",
+    'gatsby-plugin-typescript',
     'gatsby-transformer-sharp',
   ],
 }
