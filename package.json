@@ -24,7 +24,7 @@
     "gatsby-plugin-sharp": "3.0.0",
     "gatsby-plugin-sitemap": "3.0.0",
     "gatsby-plugin-twitter": "3.0.0",
-    "gatsby-plugin-typegen": "^2.2.4",
+    "gatsby-plugin-typegen": "^3.0.0",
     "gatsby-plugin-typescript": "^3.0.0",
     "gatsby-remark-copy-linked-files": "3.0.0",
     "gatsby-remark-images": "4.0.0",
